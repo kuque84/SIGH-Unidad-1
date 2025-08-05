@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Introducción Avanzada a los Sistemas de Gestión Hotelera</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- 
+        Chosen Palette: Calm Harmony (Slate, Sky, Amber)
+        Application Structure Plan: A single-page application with a sticky navigation header to jump between thematic sections. The structure is designed for exploration rather than linear reading. It includes an interactive timeline for history, clickable cards for the software ecosystem, accordions for detailed functions, a new section for key performance metrics with a Chart.js visualization, a comparison table for deployment models, and a section on integrations and future trends. This non-linear, interactive approach enhances student engagement and allows them to focus on specific areas of interest, making the complex information more digestible and easier to learn, while providing advanced content and practical examples.
+        Visualization & Content Choices: 
+        - History -> Goal: Show evolution -> Method: Interactive CSS/JS timeline -> Interaction: Click to reveal era details -> Justification: More engaging than a static list, highlights key milestones with detailed historical context and challenges.
+        - Ecosystem -> Goal: Show relationships and individual roles -> Method: Interactive CSS Grid cards with expanded content -> Interaction: Hover for visual feedback, click for deeper understanding -> Justification: Visually represents the concept and allows focused, detailed learning for each system, including practical examples of their interplay.
+        - Functions -> Goal: Organize detailed operational insights -> Method: Two-column accordion layout with rich bullet points, advanced concepts, and explicit comparisons/scenarios -> Interaction: Click to expand/collapse -> Justification: Prevents information overload, keeps the UI clean, and provides comprehensive practical context with clear benefits of automation.
+        - Key Metrics -> Goal: Illustrate performance indicators -> Method: Chart.js Line Chart with hypothetical data -> Interaction: Hover for tooltips -> Justification: Visualizes abstract concepts (RevPAR, ADR, Ocupación) and demonstrates their relationship, reinforced by detailed textual explanations of their strategic importance.
+        - Deployment Models -> Goal: Compare options -> Method: Two-column comparison table -> Interaction: Static comparison -> Justification: Clearly contrasts pros and cons of On-Premise vs. Cloud with deeper implications for business strategy, IT, and scalability.
+        - Benefits -> Goal: Highlight key advantages with examples -> Method: Icon-based grid with expanded text -> Interaction: Hover effects -> Justification: Scannable, visually appealing, and provides concrete, quantified examples of impact and strategic value.
+        - Integrations & Trends -> Goal: Discuss future-proofing -> Method: Textual explanation with key points and future implications -> Justification: Provides forward-looking context for the industry, emphasizing the evolving role of SIGHs.
+        CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8fafc; /* slate-50 */
+      }
+      .nav-link {
+        transition: color 0.3s ease;
+      }
+      .nav-link:hover {
+        color: #0284c7; /* sky-600 */
+      }
+      .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+          0 4px 6px -4px rgb(0 0 0 / 0.1);
+      }
+      .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-in-out;
+      }
+      .accordion-button.active + .accordion-content {
+        max-height: 1000px; /* Sufficiently large to accommodate content */
+      }
+      .timeline-content {
+        display: none;
+      }
+      .timeline-content.active {
+        display: block;
+      }
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 800px; /* Max width for chart to prevent excessive stretching */
+        margin-left: auto;
+        margin-right: auto;
+        height: 350px; /* Base height for desktop */
+        max-height: 450px; /* Max height for chart */
+      }
+      @media (max-width: 768px) {
+        .chart-container {
+          height: 250px; /* Smaller height for mobile */
+          max-height: 300px;
+        }
+      }
+    </style>
+  </head>
+  <body class="text-slate-700">
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+      <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex-shrink-0">
+            <h1 class="text-xl font-bold text-slate-800">SIGH Avanzado</h1>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <a
+                href="#intro"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium"
+                >Introducción</a
+              >
+              <a
+                href="#history"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium"
+                >Historia</a
+              >
+              <a
+                href="#ecosystem"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium"
+                >Ecosistema</a
+              >
+              <a
+                href="#functions"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium"
+                >Funciones</a
+              >
+              <a
+                href="#metrics"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium"
+                >Métricas</a
+              >
+              <a
+                href="#deployment"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium"
+                >Despliegue</a
+              >
+              <a
+                href="#benefits"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium"
+                >Beneficios</a
+              >
+              <a
+                href="#strategy"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium"
+                >Estrategia</a
+              >
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <section id="intro" class="text-center py-16">
+        <h2 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4">
+          El Corazón Digital del Hotel: Un Análisis Avanzado
+        </h2>
+        <p class="max-w-3xl mx-auto text-lg text-slate-600 mb-8">
+          Adéntrate en el mundo de los Sistemas de Gestión Hotelera (SIGH/PMS),
+          la columna vertebral tecnológica que transforma la operación hotelera
+          de una simple automatización a una plataforma de decisión estratégica,
+          mejorando la eficiencia y la experiencia del huésped. Esta aplicación
+          interactiva te guiará a través de la evolución, componentes, funciones
+          avanzadas y el impacto estratégico de estas herramientas esenciales.
+        </p>
+        <div
+          class="bg-white p-8 rounded-xl shadow-lg border border-slate-200 max-w-4xl mx-auto"
+        >
+          <h3 class="text-2xl font-bold text-sky-700 mb-3">
+            Objetivo Principal de un SIGH Moderno: Más Allá de la Gestión
+          </h3>
+          <p class="text-slate-600">
+            Un SIGH contemporáneo busca centralizar la información y automatizar
+            procesos no solo para la eficiencia básica, sino para **maximizar la
+            eficiencia operativa, optimizar la rentabilidad a través de
+            estrategias dinámicas de precios, elevar la experiencia del huésped
+            a niveles personalizados y potenciar la toma de decisiones
+            estratégicas basadas en datos en tiempo real.** En esencia, un SIGH
+            avanzado es una herramienta de **inteligencia de negocio** que
+            permite a la gerencia anticiparse a las tendencias y responder
+            proactivamente a las demandas del mercado.
+          </p>
+        </div>
+      </section>
+
+      <section id="history" class="py-16">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900">
+            Un Viaje en el Tiempo: Evolución del SIGH ⏳
+          </h2>
+          <p class="max-w-2xl mx-auto mt-4 text-slate-600">
+            Explora cómo la gestión hotelera ha evolucionado, desde los
+            registros manuales y rudimentarios hasta las sofisticadas
+            plataformas conectadas de hoy. Haz clic en cada etapa para ver los
+            detalles, los avances tecnológicos clave y los desafíos superados en
+            cada era.
+          </p>
+        </div>
+        <div class="relative">
+          <div
+            class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-sky-200 -translate-y-1/2"
+          ></div>
+          <div id="timeline-nav" class="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div class="text-center">
+              <button
+                data-target="era1"
+                class="timeline-btn relative w-12 h-12 bg-white border-4 border-sky-500 rounded-full flex items-center justify-center text-xl font-bold text-sky-600 mx-auto"
+              >
+                1
+              </button>
+              <p class="mt-2 font-semibold">Era Pre-Digital</p>
+            </div>
+            <div class="text-center">
+              <button
+                data-target="era2"
+                class="timeline-btn relative w-12 h-12 bg-white border-4 border-sky-300 rounded-full flex items-center justify-center text-xl font-bold text-sky-600 mx-auto"
+              >
+                2
+              </button>
+              <p class="mt-2 font-semibold">Primeros Pasos</p>
+            </div>
+            <div class="text-center">
+              <button
+                data-target="era3"
+                class="timeline-btn relative w-12 h-12 bg-white border-4 border-sky-300 rounded-full flex items-center justify-center text-xl font-bold text-sky-600 mx-auto"
+              >
+                3
+              </button>
+              <p class="mt-2 font-semibold">Expansión</p>
+            </div>
+            <div class="text-center">
+              <button
+                data-target="era4"
+                class="timeline-btn relative w-12 h-12 bg-white border-4 border-sky-300 rounded-full flex items-center justify-center text-xl font-bold text-sky-600 mx-auto"
+              >
+                4
+              </button>
+              <p class="mt-2 font-semibold">Era de la Conectividad</p>
+            </div>
+          </div>
+        </div>
+        <div
+          id="timeline-content-area"
+          class="mt-12 bg-white p-8 rounded-xl shadow-lg border border-slate-200 min-h-[280px]"
+        >
+          <div id="era1" class="timeline-content active">
+            <h3 class="font-bold text-xl text-sky-700 mb-2">
+              Era Pre-Digital (Hasta mediados del Siglo XX)
+            </h3>
+            <p class="mb-3">
+              Antes de la informática, la gestión hotelera era un arte manual
+              intensivo en mano de obra. Los hoteles dependían de:
+            </p>
+            <ul class="list-disc list-inside space-y-1 text-sm mb-3">
+              <li>
+                **Libros de registro físicos:** Para reservas, check-ins, y
+                control de habitaciones. Esto implicaba hojas de papel para cada
+                día, con cuadrículas para las habitaciones.
+              </li>
+              <li>
+                **Fichas de cartón o index cards:** Para los datos de los
+                huéspedes y su historial (si es que se mantenía).
+              </li>
+              <li>
+                **Comunicación telefónica y verbal:** Para coordinar entre
+                departamentos (ej. recepción y ama de llaves).
+              </li>
+            </ul>
+            <p class="font-semibold text-amber-700 mb-2">Desafíos Clave:</p>
+            <ul class="list-disc list-inside space-y-1 text-sm">
+              <li>
+                **Alta probabilidad de errores:** Duplicidad de reservas,
+                errores en tarifas, omisión de cargos.
+              </li>
+              <li>
+                **Lentitud operativa:** Procesos como la búsqueda de
+                disponibilidad o el check-in eran tediosos y consumían mucho
+                tiempo.
+              </li>
+              <li>
+                **Incapacidad de consolidar datos:** Imposibilidad de generar
+                reportes precisos o analizar tendencias para la toma de
+                decisiones estratégicas. La información era un activo estático,
+                descentralizado y difícil de auditar.
+              </li>
+              <li>
+                **Servicio al cliente inconsistente:** Sin un historial de
+                preferencias accesible, la personalización era casi imposible.
+              </li>
+            </ul>
+          </div>
+          <div id="era2" class="timeline-content">
+            <h3 class="font-bold text-xl text-sky-700 mb-2">
+              Primeros Pasos hacia la Automatización (Años 60s y 70s)
+            </h3>
+            <p class="mb-3">
+              La década de 1960 marcó el inicio de la era informática en la
+              hotelería, aunque de forma muy limitada y exclusiva.
+            </p>
+            <ul class="list-disc list-inside space-y-1 text-sm mb-3">
+              <li>
+                **1963:** El **Hotel Hilton de Nueva York** fue pionero al
+                instalar la **primera computadora** para gestionar tareas
+                administrativas básicas como la facturación y el control de
+                inventario. Esto fue un hito, pero aún lejos de un sistema
+                integrado.
+              </li>
+              <li>
+                **1970:** El **Hotel Sheraton** implementa el **primer SIGH
+                rudimentario**, conocido como "Reservatron". Este sistema
+                permitía la gestión de reservas a nivel centralizado, un avance
+                significativo para cadenas hoteleras.
+              </li>
+              <li>
+                **Tecnología:** Mainframes y minicomputadoras, con interfaces de
+                línea de comandos.
+              </li>
+            </ul>
+            <p class="font-semibold text-amber-700 mb-2">Desafíos Clave:</p>
+            <ul class="list-disc list-inside space-y-1 text-sm">
+              <li>
+                **Costos prohibitivos:** La inversión en hardware y software era
+                gigantesca, solo accesible para las cadenas más grandes.
+              </li>
+              <li>
+                **Complejidad y personal especializado:** Requerían equipos de
+                TI dedicados para su operación y mantenimiento.
+              </li>
+              <li>
+                **Funcionalidad limitada:** Se centraban principalmente en
+                reservas y facturación básica, sin la integración departamental
+                actual.
+              </li>
+              <li>
+                **Falta de flexibilidad:** Eran sistemas rígidos, difíciles de
+                adaptar a las necesidades cambiantes del hotel.
+              </li>
+            </ul>
+          </div>
+          <div id="era3" class="timeline-content">
+            <h3 class="font-bold text-xl text-sky-700 mb-2">
+              Expansión y Democratización (Años 80s y 90s)
+            </h3>
+            <p class="mb-3">
+              La llegada de las computadoras personales (PCs) y el desarrollo de
+              software más amigable y asequible transformaron el panorama,
+              haciendo los SIGH accesibles para un rango más amplio de hoteles.
+            </p>
+            <ul class="list-disc list-inside space-y-1 text-sm mb-3">
+              <li>
+                **Masificación de las PCs:** Redujo drásticamente los costos de
+                hardware, permitiendo a hoteles medianos y pequeños considerar
+                la automatización.
+              </li>
+              <li>
+                **Desarrollo de interfaces gráficas de usuario (GUI):** Hizo los
+                sistemas más intuitivos y fáciles de usar para el personal no
+                técnico.
+              </li>
+              <li>
+                **Aparición de módulos especializados:** Los SIGH comenzaron a
+                integrar funciones para ama de llaves, contabilidad, gestión de
+                eventos, etc., aunque a menudo como módulos separados.
+              </li>
+              <li>
+                **Crecimiento de la competencia:** Más proveedores de software
+                entraron al mercado, impulsando la innovación y la mejora de las
+                funcionalidades.
+              </li>
+            </ul>
+            <p class="font-semibold text-amber-700 mb-2">Desafíos Clave:</p>
+            <ul class="list-disc list-inside space-y-1 text-sm">
+              <li>
+                **Sistemas "isla":** A menudo, los módulos no se comunicaban
+                eficientemente entre sí, creando silos de información.
+              </li>
+              <li>
+                **Actualizaciones complejas:** Las actualizaciones de software y
+                hardware seguían siendo un desafío y requerían interrupciones
+                operativas.
+              </li>
+              <li>
+                **Dependencia de la infraestructura local:** Los hoteles
+                necesitaban mantener sus propios servidores y redes, lo que
+                implicaba costos y riesgos.
+              </li>
+            </ul>
+          </div>
+          <div id="era4" class="timeline-content">
+            <h3 class="font-bold text-xl text-sky-700 mb-2">
+              La Era de las TIC y la Conectividad (Siglo XXI - Actualidad)
+            </h3>
+            <p class="mb-3">
+              La explosión de Internet y las Tecnologías de Información y
+              Comunicación (TIC) revolucionó por completo la industria. Los SIGH
+              se volvieron plataformas integradas y globalmente conectadas.
+            </p>
+            <ul class="list-disc list-inside space-y-1 text-sm mb-3">
+              <li>
+                **Sistemas basados en la nube (Cloud-based PMS):** Elimina la
+                necesidad de servidores locales, ofreciendo accesibilidad desde
+                cualquier lugar, escalabilidad y actualizaciones automáticas.
+              </li>
+              <li>
+                **Integración con el ecosistema digital:** Conexión fluida con
+                Channel Managers, Motores de Reservas Online, GDS, RMS, CRM y
+                sistemas de punto de venta (POS).
+              </li>
+              <li>
+                **Enfoque en la Experiencia del Huésped:** Desarrollo de
+                funcionalidades para check-in/out móvil, llaves digitales,
+                comunicación personalizada y servicios a la carta.
+              </li>
+              <li>
+                **Análisis de Big Data e Inteligencia de Negocio:** Los SIGH se
+                convierten en herramientas para recopilar y analizar grandes
+                volúmenes de datos, permitiendo una toma de decisiones
+                predictiva y estratégica.
+              </li>
+            </ul>
+            <p class="font-semibold text-amber-700 mb-2">Impacto Actual:</p>
+            <ul class="list-disc list-inside space-y-1 text-sm">
+              <li>
+                **"Socio indispensable":** Los SIGH son la interfaz principal
+                entre consumidores y proveedores a nivel mundial.
+              </li>
+              <li>
+                **Gestión en tiempo real:** Permite una respuesta inmediata a
+                las fluctuaciones del mercado y la demanda.
+              </li>
+              <li>
+                **Optimización de ingresos:** A través de la gestión dinámica de
+                precios y la distribución eficiente.
+              </li>
+              <li>
+                **Experiencia de huésped sin fricciones:** Desde la reserva
+                hasta el post-estancia.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="ecosystem" class="py-16 bg-white rounded-2xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900">
+            El Ecosistema del Software Hotelero: Interconexión y Eficiencia 🌐
+          </h2>
+          <p class="max-w-2xl mx-auto mt-4 text-slate-600">
+            Un hotel moderno opera con un conjunto de herramientas
+            interconectadas que forman un ecosistema digital. Cada sistema tiene
+            un rol específico y su integración es clave para una gestión fluida
+            y la maximización de ingresos. Haz clic en cada tarjeta para
+            entender su función y ejemplos prácticos.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="card bg-slate-50 p-6 rounded-lg border border-slate-200">
+            <h3 class="text-xl font-bold mb-2">
+              🧠 PMS (Property Management System) - El Cerebro Central
+            </h3>
+            <p class="text-sm mb-4">
+              Es el sistema central que gestiona todas las operaciones internas
+              del hotel. Actúa como el **repositorio principal de datos** del
+              huésped, reservas y habitaciones. Su eficiencia impacta
+              directamente en la operación diaria.
+            </p>
+            <p class="text-xs text-slate-500">
+              **Ejemplo práctico:** Un recepcionista utiliza el PMS para ver la
+              disponibilidad de habitaciones en tiempo real, asignar una a un
+              huésped que llega (walk-in) y registrar sus datos personales y de
+              pago. Si el huésped solicita un cambio de habitación, el PMS lo
+              gestiona instantáneamente, actualizando el estado de ambas
+              habitaciones.
+            </p>
+          </div>
+          <div class="card bg-slate-50 p-6 rounded-lg border border-slate-200">
+            <h3 class="text-xl font-bold mb-2">
+              🔗 Channel Manager (Gestor de Canales) - El Puente de Distribución
+            </h3>
+            <p class="text-sm mb-4">
+              Sincroniza automáticamente la disponibilidad de habitaciones y las
+              tarifas del hotel en tiempo real a través de múltiples **OTAs
+              (Online Travel Agencies)** como Booking.com, Expedia, Despegar,
+              Airbnb, etc., y otros canales de distribución. Es crucial para
+              **evitar el overbooking** y asegurar la coherencia de precios.
+            </p>
+            <p class="text-xs text-slate-500">
+              **Ejemplo práctico:** Si un hotel tiene 5 habitaciones disponibles
+              y se reserva 1 directamente desde su web (vía el Motor de
+              Reservas), el Channel Manager reduce automáticamente la
+              disponibilidad a 4 habitaciones en todas las OTAs conectadas en
+              cuestión de segundos. Esto previene que se vendan habitaciones que
+              ya no están disponibles.
+            </p>
+          </div>
+          <div class="card bg-slate-50 p-6 rounded-lg border border-slate-200">
+            <h3 class="text-xl font-bold mb-2">
+              💻 Motor de Reservas Online (Booking Engine) - La Venta Directa
+            </h3>
+            <p class="text-sm mb-4">
+              Permite a los huéspedes **reservar directamente** en la página web
+              oficial del hotel. Su integración con el PMS es vital para la
+              disponibilidad y con el Channel Manager para la sincronización. Es
+              la herramienta principal para **reducir las comisiones** a
+              terceros.
+            </p>
+            <p class="text-xs text-slate-500">
+              **Ejemplo práctico:** Un huésped visita la web del hotel,
+              selecciona sus fechas y tipo de habitación. El Motor de Reservas
+              muestra la disponibilidad y las tarifas en tiempo real (obtenidas
+              del PMS), permite completar el pago y confirma la reserva, que se
+              registra directamente en el PMS y se sincroniza a través del
+              Channel Manager.
+            </p>
+          </div>
+          <div class="card bg-slate-50 p-6 rounded-lg border border-slate-200">
+            <h3 class="text-xl font-bold mb-2">
+              🛒 POS (Point of Sale) - La Gestión de Consumos Internos
+            </h3>
+            <p class="text-sm mb-4">
+              Gestiona las ventas de productos y servicios adicionales dentro
+              del hotel, como los de restaurante, bar, spa, lavandería o tienda
+              de regalos. Se integra con el PMS para **cargar los consumos
+              directamente a la cuenta de la habitación** del huésped.
+            </p>
+            <p class="text-xs text-slate-500">
+              **Ejemplo práctico:** Un huésped cena en el restaurante del hotel.
+              Al finalizar, en lugar de pagar en el restaurante, el cargo se
+              envía automáticamente a su cuenta en el PMS (asociado a su número
+              de habitación), facilitando una única factura consolidada al
+              momento del check-out. Esto mejora la experiencia del cliente y la
+              eficiencia de la facturación.
+            </p>
+          </div>
+          <div class="card bg-slate-50 p-6 rounded-lg border border-slate-200">
+            <h3 class="text-xl font-bold mb-2">
+              ❤️ CRM (Customer Relationship Management) - La Fidelización
+              Inteligente
+            </h3>
+            <p class="text-sm mb-4">
+              Almacena y gestiona la información detallada de los clientes
+              (historial de estadías, preferencias, quejas, interacciones) para
+              mejorar las relaciones comerciales, personalizar la comunicación y
+              las ofertas. Utiliza datos del PMS para construir perfiles de
+              huéspedes enriquecidos.
+            </p>
+            <p class="text-xs text-slate-500">
+              **Ejemplo práctico:** El CRM, al integrarse con el PMS, identifica
+              a un huésped frecuente que siempre solicita una habitación con
+              vista al mar y un tipo de almohada específico. Antes de su próxima
+              llegada, el CRM puede enviar un correo electrónico personalizado
+              con una oferta para una habitación similar y asegurar que sus
+              preferencias estén listas, aumentando la satisfacción y la
+              lealtad.
+            </p>
+          </div>
+          <div class="card bg-slate-50 p-6 rounded-lg border border-slate-200">
+            <h3 class="text-xl font-bold mb-2">
+              📈 RMS (Revenue Management System) - La Estrategia de Precios
+              Dinámica
+            </h3>
+            <p class="text-sm mb-4">
+              Utiliza algoritmos avanzados, análisis de Big Data (históricos y
+              predictivos de demanda, eventos, competidores) para **optimizar
+              las tarifas y la disponibilidad de habitaciones en tiempo real**,
+              buscando maximizar los ingresos y la rentabilidad (Revenue
+              Management).
+            </p>
+            <p class="text-xs text-slate-500">
+              **Ejemplo práctico:** Ante la noticia de un concierto importante
+              en la ciudad, el RMS, al analizar la demanda esperada y las
+              tarifas de la competencia, puede sugerir o ajustar automáticamente
+              las tarifas de las habitaciones al alza para capitalizar la alta
+              demanda. Inversamente, en temporada baja, puede recomendar
+              descuentos o paquetes para mantener una ocupación óptima sin
+              sacrificar demasiado el ADR.
+            </p>
+          </div>
+          <div class="card bg-slate-50 p-6 rounded-lg border border-slate-200">
+            <h3 class="text-xl font-bold mb-2">
+              ✈️ GDS (Global Distribution System) - La Conexión Global B2B
+            </h3>
+            <p class="text-sm mb-4">
+              Son redes de distribución masivas que permiten a las agencias de
+              viajes (tradicionales y online) y operadores turísticos acceder a
+              información de vuelos, hoteles, alquiler de coches y otros
+              servicios turísticos a nivel global. El GDS es crucial para la
+              **distribución a gran escala en el segmento corporativo y
+              mayorista**.
+            </p>
+            <p class="text-xs text-slate-500">
+              **Ejemplo práctico:** Una gran corporación o una agencia de viajes
+              internacional utiliza un GDS para buscar y reservar bloques de
+              habitaciones en tu hotel para sus clientes o eventos. El SIGH del
+              hotel se conecta al GDS, actualizando la disponibilidad y tarifas
+              para estos canales específicos, ampliando el alcance del mercado
+              del hotel más allá de las OTAs y la venta directa.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="functions" class="py-16">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900">
+            Funciones Clave de un SIGH: Profundizando en Front-Office y
+            Back-Office 🏢
+          </h2>
+          <p class="max-w-2xl mx-auto mt-4 text-slate-600">
+            Un SIGH integra funcionalidades esenciales para las operaciones de
+            cara al cliente (Front-Office) y la administración interna
+            (Back-Office). Explora cada una para entender su impacto operativo,
+            con ejemplos y comparaciones que resaltan la eficiencia que aportan.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h3 class="text-2xl font-bold text-center mb-6 text-sky-700">
+              🛎️ Front-Office (Cara al Cliente)
+            </h3>
+            <div class="space-y-4">
+              <div
+                class="accordion-item bg-white rounded-lg border border-slate-200"
+              >
+                <button
+                  class="accordion-button w-full text-left p-4 font-semibold flex justify-between items-center"
+                >
+                  Recepción
+                </button>
+                <div class="accordion-content px-4 pb-4 text-sm">
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>
+                      **Check-in y Check-out eficientes:** Agiliza la llegada y
+                      salida de huéspedes. El sistema permite registrar datos,
+                      asignar habitaciones y emitir llaves en segundos.
+                      **Ejemplo:** Un huésped llega y el recepcionista, con un
+                      par de clics, lo registra, asigna la habitación
+                      pre-reservada y activa su llave electrónica.
+                      **Comparación:** Sin SIGH, el proceso podría tardar 10-15
+                      minutos por huésped, generando filas y frustración.
+                    </li>
+                    <li>
+                      **Registro de Huéspedes y Ficha de Huésped:** Captura y
+                      almacenamiento de datos personales (nombre, DNI/pasaporte,
+                      dirección, contacto), preferencias (tipo de cama, vista,
+                      alergias) y motivo de la visita. El sistema crea un perfil
+                      único para cada huésped.
+                    </li>
+                    <li>
+                      **Manejo de Walk-ins:** Gestión rápida de huéspedes que
+                      llegan sin reserva. El sistema sugiere habitaciones
+                      disponibles y tarifas óptimas al instante.
+                    </li>
+                    <li>
+                      **Gestión de Llaves/Tarjetas:** Integración directa con
+                      sistemas de cerraduras electrónicas para codificar y
+                      activar llaves/tarjetas de acceso para la duración de la
+                      estadía.
+                    </li>
+                    <li>
+                      **Servicios de Conserjería Integrados:** Algunos SIGH
+                      permiten registrar solicitudes de conserjería (taxis,
+                      tours, recomendaciones) y hacer seguimiento de su
+                      cumplimiento.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div
+                class="accordion-item bg-white rounded-lg border border-slate-200"
+              >
+                <button
+                  class="accordion-button w-full text-left p-4 font-semibold flex justify-between items-center"
+                >
+                  Reservas
+                </button>
+                <div class="accordion-content px-4 pb-4 text-sm">
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>
+                      **Creación, modificación y cancelación de reservas:**
+                      Flexibilidad para manejar reservas individuales, grupales,
+                      corporativas, o de agencias. Permite ajustar fechas, tipos
+                      de habitación, tarifas y añadir notas especiales.
+                    </li>
+                    <li>
+                      **Búsqueda de Disponibilidad en Tiempo Real:** El sistema
+                      muestra el inventario exacto de habitaciones disponibles
+                      por fecha, tipo y tarifa, evitando la sobreventa
+                      (overbooking). **Comparación:** En sistemas manuales, el
+                      overbooking es un riesgo constante que genera costos
+                      (reubicación de huéspedes) y daña la reputación del hotel.
+                    </li>
+                    <li>
+                      **Planning Gráfico (Room Rack):** Una representación
+                      visual interactiva de todas las habitaciones y su
+                      ocupación a lo largo del tiempo. Permite arrastrar y
+                      soltar reservas para cambios de habitación o extender
+                      estadías. Facilita la asignación eficiente.
+                    </li>
+                    <li>
+                      **Gestión de Cupos y Bloqueos:** Permite bloquear
+                      habitaciones para mantenimiento, uso interno, o asignar
+                      cupos preestablecidos a agencias específicas, garantizando
+                      que el inventario se gestione estratégicamente.
+                    </li>
+                    <li>
+                      **Listas de Espera:** Capacidad para registrar huéspedes
+                      interesados en fechas o tipos de habitación no
+                      disponibles, y notificarles automáticamente si surge una
+                      apertura.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div
+                class="accordion-item bg-white rounded-lg border border-slate-200"
+              >
+                <button
+                  class="accordion-button w-full text-left p-4 font-semibold flex justify-between items-center"
+                >
+                  Facturación
+                </button>
+                <div class="accordion-content px-4 pb-4 text-sm">
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>
+                      **Generación Automática de Facturas:** Emisión rápida y
+                      precisa de facturas por alojamiento y todos los consumos
+                      adicionales. El sistema calcula automáticamente impuestos
+                      y descuentos.
+                    </li>
+                    <li>
+                      **Registro de Cargos Adicionales:** Permite cargar
+                      servicios de restaurante, bar, lavandería, spa, llamadas
+                      telefónicas, etc., directamente a la cuenta de la
+                      habitación del huésped. **Ejemplo:** Un cargo del mini-bar
+                      se registra al instante en el POS y se suma
+                      automáticamente a la cuenta del huésped en el PMS.
+                    </li>
+                    <li>
+                      **Gestión de Múltiples Métodos de Pago:** Soporte para
+                      efectivo, tarjetas de crédito/débito, transferencias
+                      bancarias, pagos con puntos de fidelidad, y pagos
+                      divididos entre diferentes métodos o personas.
+                    </li>
+                    <li>
+                      **División de Cuentas (Split Billing):** Capacidad
+                      avanzada para separar cargos entre varios huéspedes, o
+                      entre el huésped y una empresa. **Ejemplo:** En una
+                      reserva grupal o corporativa, se pueden facturar los
+                      alojamientos a la empresa y los extras (ej. bebidas del
+                      bar) a cada individuo.
+                    </li>
+                    <li>
+                      **Cuentas Maestras (Master Accounts):** Gestión de cuentas
+                      para empresas o agencias que pagan por múltiples reservas,
+                      facilitando la facturación centralizada y el control de
+                      crédito.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div
+                class="accordion-item bg-white rounded-lg border border-slate-200"
+              >
+                <button
+                  class="accordion-button w-full text-left p-4 font-semibold flex justify-between items-center"
+                >
+                  Ama de Llaves
+                </button>
+                <div class="accordion-content px-4 pb-4 text-sm">
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>
+                      **Control de Estado de Habitaciones en Tiempo Real:**
+                      Actualización instantánea del estado de limpieza (limpia,
+                      sucia, pendiente de limpieza, inspeccionada, fuera de
+                      servicio). **Ejemplo:** Recepción sabe al instante qué
+                      habitaciones están listas para el próximo huésped,
+                      optimizando el tiempo de espera.
+                    </li>
+                    <li>
+                      **Bloqueo de Habitaciones:** Marcar habitaciones fuera de
+                      servicio por mantenimiento, reparaciones, o usos internos,
+                      evitando que se asignen por error.
+                    </li>
+                    <li>
+                      **Asignación de Órdenes de Trabajo:** Creación y
+                      seguimiento digital de tareas para el personal de limpieza
+                      o mantenimiento, mejorando la comunicación y la
+                      eficiencia.
+                    </li>
+                    <li>
+                      **Reportes de Discrepancia:** Identifica automáticamente
+                      diferencias entre el estado físico de la habitación
+                      (reportado por ama de llaves) y el registrado en el
+                      sistema (ej. una habitación marcada como "limpia" pero aún
+                      ocupada), crucial para la auditoría y la seguridad.
+                    </li>
+                    <li>
+                      **Gestión de Objetos Perdidos:** Algunos SIGHs tienen
+                      módulos para registrar y hacer seguimiento de objetos
+                      olvidados por los huéspedes.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-2xl font-bold text-center mb-6 text-amber-600">
+              📊 Back-Office (Administración Interna)
+            </h3>
+            <div class="space-y-4">
+              <div
+                class="accordion-item bg-white rounded-lg border border-slate-200"
+              >
+                <button
+                  class="accordion-button w-full text-left p-4 font-semibold flex justify-between items-center"
+                >
+                  Contabilidad y Finanzas
+                </button>
+                <div class="accordion-content px-4 pb-4 text-sm">
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>
+                      **Gestión de Ingresos y Egresos:** Registro detallado de
+                      todas las transacciones financieras del hotel, incluyendo
+                      pagos de huéspedes, facturas de proveedores, nóminas, etc.
+                    </li>
+                    <li>
+                      **Elaboración de Estados de Cuenta Automatizados:**
+                      Generación automática de balances, estados de resultados y
+                      flujos de caja, facilitando la auditoría y el análisis
+                      financiero.
+                    </li>
+                    <li>
+                      **Integración con Sistemas Contables Externos:** Muchos
+                      SIGH permiten exportar datos financieros en formatos
+                      compatibles (ej. CSV, XML) o tienen APIs para conectarse
+                      directamente con software de contabilidad (ej. SAP,
+                      QuickBooks, Tally).
+                    </li>
+                    <li>
+                      **Gestión de Proveedores y Cuentas por Pagar:** Registro
+                      de facturas de proveedores, seguimiento de vencimientos y
+                      automatización de pagos.
+                    </li>
+                    <li>
+                      **Conciliación Bancaria:** Facilita la comparación de los
+                      registros del hotel con los extractos bancarios para
+                      identificar y resolver discrepancias.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div
+                class="accordion-item bg-white rounded-lg border border-slate-200"
+              >
+                <button
+                  class="accordion-button w-full text-left p-4 font-semibold flex justify-between items-center"
+                >
+                  Estadísticas y Reportes
+                </button>
+                <div class="accordion-content px-4 pb-4 text-sm">
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>
+                      **Generación de Informes Clave (KPIs):** Ocupación, ADR
+                      (Tarifa Diaria Promedio), RevPar (Ingreso por Habitación
+                      Disponible), origen de reservas, segmentos de clientes,
+                      duración promedio de la estadía, etc.
+                    </li>
+                    <li>
+                      **Análisis de Datos para Toma de Decisiones
+                      Estratégicas:** Permite identificar tendencias de demanda,
+                      estacionalidad, puntos fuertes, debilidades y
+                      oportunidades de mercado. **Ejemplo:** Un reporte de
+                      ocupación por día de la semana puede revelar patrones que
+                      ayuden a la gerencia a ajustar la dotación de personal o
+                      lanzar promociones específicas en días de baja demanda.
+                    </li>
+                    <li>
+                      **Forecasting (Pronóstico de Demanda):** Basado en datos
+                      históricos y algoritmos predictivos, el SIGH puede
+                      proyectar la demanda futura para optimizar precios,
+                      inventario y planificación de recursos.
+                    </li>
+                    <li>
+                      **Informes Personalizables:** La capacidad de crear
+                      reportes a medida según las necesidades específicas de
+                      análisis del hotel.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div
+                class="accordion-item bg-white rounded-lg border border-slate-200"
+              >
+                <button
+                  class="accordion-button w-full text-left p-4 font-semibold flex justify-between items-center"
+                >
+                  Parametrización
+                </button>
+                <div class="accordion-content px-4 pb-4 text-sm">
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>
+                      **Configuración Maestra:** Creación y modificación de
+                      todos los parámetros operativos del hotel: tipos de
+                      habitación (ej. simple, doble, suite), tarifas (ej. rack,
+                      corporativa, promocional), paquetes (ej. alojamiento +
+                      desayuno), contratos con agencias, impuestos, etc.
+                    </li>
+                    <li>
+                      **Reglas de Negocio y Restricciones:** Definición de
+                      condiciones para la aplicación de tarifas (ej. mínimo de
+                      noches, no reembolsable, solo para ciertos segmentos de
+                      mercado), descuentos y promociones.
+                    </li>
+                    <li>
+                      **Flexibilidad y Adaptabilidad:** Permite que el sistema
+                      se adapte a las necesidades específicas y cambiantes de
+                      cada hotel, así como a las regulaciones locales.
+                    </li>
+                    <li>
+                      **Gestión de Usuarios y Permisos:** Configuración de roles
+                      y permisos para cada empleado, asegurando que solo accedan
+                      a las funciones y datos necesarios.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div
+                class="accordion-item bg-white rounded-lg border border-slate-200"
+              >
+                <button
+                  class="accordion-button w-full text-left p-4 font-semibold flex justify-between items-center"
+                >
+                  Auditoría Nocturna
+                </button>
+                <div class="accordion-content px-4 pb-4 text-sm">
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>
+                      **Cierre del Día (End of Day - EOD):** Proceso
+                      automatizado que verifica todas las transacciones del día,
+                      cuadra las cuentas (ingresos, pagos, cargos), y prepara el
+                      sistema para el día siguiente. Es un proceso crítico que
+                      asegura la integridad de los datos financieros.
+                    </li>
+                    <li>
+                      **Generación de Reportes de Cierre:** Incluye reportes
+                      detallados de ingresos por departamento, pagos recibidos,
+                      ocupación del día, saldos pendientes y movimientos de
+                      caja.
+                    </li>
+                    <li>
+                      **Detección de Discrepancias:** Ayuda a identificar
+                      errores, omisiones o posibles fraudes al final del turno o
+                      día operativo, permitiendo correcciones oportunas.
+                      **Comparación:** Sin un SIGH, la auditoría nocturna sería
+                      un proceso manual y extremadamente propenso a errores,
+                      consumiendo horas de trabajo.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="metrics" class="py-16 bg-white rounded-2xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900">
+            Métricas Clave de Desempeño Hotelero 📊
+          </h2>
+          <p class="max-w-2xl mx-auto mt-4 text-slate-600">
+            Los SIGH son fundamentales para calcular y analizar indicadores
+            clave (KPIs) que reflejan la salud financiera y operativa del hotel.
+            Comprender estas métricas es esencial para la toma de decisiones
+            estratégicas.
+          </p>
+        </div>
+        <div
+          class="chart-container bg-slate-50 p-6 rounded-lg shadow-inner border border-slate-200"
+        >
+          <canvas id="performanceChart"></canvas>
+        </div>
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          <div>
+            <h3 class="font-bold text-xl text-sky-700 mb-1">Ocupación (%)</h3>
+            <p class="text-sm text-slate-600">
+              Proporción de habitaciones ocupadas respecto al total de
+              habitaciones disponibles en un período. Es un indicador de la
+              demanda y la eficiencia en la venta del inventario.
+            </p>
+            <p class="text-xs text-slate-500 mt-1">
+              `% Ocupación = (Habitaciones Ocupadas / Habitaciones Disponibles)
+              * 100`
+            </p>
+            <p class="text-xs text-slate-500 mt-1">
+              **Importancia:** Un alto porcentaje indica buena demanda, pero no
+              necesariamente alta rentabilidad si las tarifas son bajas.
+            </p>
+          </div>
+          <div>
+            <h3 class="font-bold text-xl text-sky-700 mb-1">
+              ADR (Average Daily Rate / Tarifa Diaria Promedio)
+            </h3>
+            <p class="text-sm text-slate-600">
+              Ingreso promedio generado por cada habitación vendida en un
+              período determinado. Mide la calidad del ingreso, no el volumen.
+            </p>
+            <p class="text-xs text-slate-500 mt-1">
+              `ADR = Ingresos por Habitaciones / Habitaciones Ocupadas`
+            </p>
+            <p class="text-xs text-slate-500 mt-1">
+              **Importancia:** Un ADR alto indica que el hotel está vendiendo
+              sus habitaciones a buenos precios, pero no considera las
+              habitaciones vacías.
+            </p>
+          </div>
+          <div>
+            <h3 class="font-bold text-xl text-sky-700 mb-1">
+              RevPAR (Revenue Per Available Room / Ingreso por Habitación
+              Disponible)
+            </h3>
+            <p class="text-sm text-slate-600">
+              Ingreso generado por cada habitación disponible en el hotel, esté
+              ocupada o no. Es considerado el **indicador más completo** de
+              desempeño, ya que combina ocupación y tarifa.
+            </p>
+            <p class="text-xs text-slate-500 mt-1">
+              `RevPAR = Ingresos por Habitaciones / Habitaciones Disponibles`
+            </p>
+            <p class="text-xs text-slate-500 mt-1">
+              `O RevPAR = ADR * % Ocupación`
+            </p>
+            <p class="text-xs text-slate-500 mt-1">
+              **Importancia:** Un RevPAR alto significa que el hotel está
+              maximizando tanto la ocupación como el precio, lo que se traduce
+              directamente en mayor rentabilidad. Es el KPI preferido para
+              comparar el rendimiento entre hoteles.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="deployment" class="py-16">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900">
+            Modelos de Despliegue de SIGH: On-Premise vs. Cloud ☁️
+          </h2>
+          <p class="max-w-2xl mx-auto mt-4 text-slate-600">
+            La elección del modelo de despliegue impacta significativamente en
+            la inversión, mantenimiento, seguridad y accesibilidad del sistema.
+            Cada uno presenta un conjunto único de ventajas y desventajas que
+            deben ser cuidadosamente evaluadas según la estrategia y recursos
+            del hotel.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div
+            class="bg-white p-6 rounded-lg shadow-md border border-slate-200"
+          >
+            <h3 class="text-2xl font-bold text-center mb-4 text-sky-700">
+              🖥️ On-Premise (Local)
+            </h3>
+            <p class="text-sm mb-4">
+              En este modelo, el software se instala y opera directamente en los
+              servidores, hardware y la infraestructura de red del propio hotel.
+              El hotel es el propietario de la licencia del software y es
+              responsable de todo el mantenimiento y la gestión.
+            </p>
+            <h4 class="font-semibold text-lg mb-2 text-slate-800">
+              Ventajas Clave:
+            </h4>
+            <ul class="list-disc list-inside text-sm space-y-1">
+              <li>
+                **Control Total y Soberanía de Datos:** El hotel tiene control
+                absoluto sobre los datos, su ubicación física y cómo se
+                gestionan. Esto puede ser crucial para hoteles con estrictas
+                políticas de privacidad o regulaciones locales.
+              </li>
+              <li>
+                **Personalización Profunda:** Mayor flexibilidad para adaptar el
+                software a procesos de negocio muy específicos o para
+                integraciones complejas con sistemas legados.
+              </li>
+              <li>
+                **Seguridad de Datos Interna:** La seguridad de los datos está
+                bajo el control directo del equipo de TI del hotel, lo que puede
+                ser una ventaja para aquellos que prefieren gestionar sus
+                propios riesgos de seguridad.
+              </li>
+              <li>
+                **Independencia de Internet:** Una vez instalado, el
+                funcionamiento diario del sistema no depende de una conexión a
+                internet constante, lo que es vital en ubicaciones con
+                conectividad inestable.
+              </li>
+              <li>
+                **Inversión Única (Licencia):** Aunque el costo inicial es alto,
+                la licencia se compra una sola vez, lo que puede ser más
+                económico a muy largo plazo si no se consideran los costos de
+                mantenimiento.
+              </li>
+            </ul>
+            <h4 class="font-semibold text-lg mt-4 mb-2 text-slate-800">
+              Desventajas Clave:
+            </h4>
+            <ul class="list-disc list-inside text-sm space-y-1">
+              <li>
+                **Alto Costo Inicial (CAPEX):** Requiere una inversión
+                significativa en servidores, hardware de red, licencias de
+                software, sistemas de respaldo y posiblemente un cuarto de
+                servidores dedicado.
+              </li>
+              <li>
+                **Carga de Mantenimiento y TI:** Necesidad de personal de TI
+                interno o externo altamente calificado para la instalación,
+                mantenimiento, actualizaciones, parches de seguridad y
+                resolución de problemas.
+              </li>
+              <li>
+                **Escalabilidad Limitada y Costosa:** Adaptarse a un crecimiento
+                (más habitaciones, nuevas propiedades) implica comprar más
+                hardware y licencias, lo que es un proceso lento y costoso.
+              </li>
+              <li>
+                **Acceso Restringido:** Generalmente solo accesible desde la red
+                local del hotel, limitando la gestión remota o el trabajo desde
+                casa.
+              </li>
+              <li>
+                **Riesgos de Desastres Locales:** Vulnerabilidad a fallas de
+                hardware, cortes de energía o desastres naturales si no hay un
+                plan de recuperación robusto.
+              </li>
+            </ul>
+          </div>
+          <div
+            class="bg-white p-6 rounded-lg shadow-md border border-slate-200"
+          >
+            <h3 class="text-2xl font-bold text-center mb-4 text-amber-600">
+              ☁️ Cloud (En la Nube)
+            </h3>
+            <p class="text-sm mb-4">
+              El software es alojado y gestionado por un proveedor de servicios
+              externo, accesible a través de internet mediante un navegador web.
+              El hotel paga una suscripción periódica (modelo SaaS - Software as
+              a Service).
+            </p>
+            <h4 class="font-semibold text-lg mb-2 text-slate-800">
+              Ventajas Clave:
+            </h4>
+            <ul class="list-disc list-inside text-sm space-y-1">
+              <li>
+                **Menor Costo Inicial (OPEX):** No requiere inversión en
+                hardware ni licencias de software, solo una suscripción mensual
+                o anual, lo que reduce la barrera de entrada.
+              </li>
+              <li>
+                **Accesibilidad Remota y Movilidad:** Se puede acceder al
+                sistema desde cualquier lugar con conexión a internet y
+                cualquier dispositivo (computadora, tablet, smartphone), ideal
+                para la gestión móvil o multi-propiedad.
+              </li>
+              <li>
+                **Actualizaciones y Mantenimiento Automáticos:** El proveedor se
+                encarga de todas las actualizaciones de software, parches de
+                seguridad y el mantenimiento de la infraestructura, reduciendo
+                significativamente la carga de TI del hotel.
+              </li>
+              <li>
+                **Escalabilidad Instantánea:** Fácil de escalar (añadir
+                habitaciones, propiedades, usuarios) según las necesidades del
+                negocio, con solo ajustar la suscripción.
+              </li>
+              <li>
+                **Alta Disponibilidad y Respaldo:** Los proveedores de nube
+                suelen ofrecer altos estándares de tiempo de actividad,
+                redundancia y copias de seguridad automáticas de los datos.
+              </li>
+              <li>
+                **Integración Simplificada:** Generalmente diseñados para
+                integrarse más fácilmente con otros sistemas en la nube (Channel
+                Managers, Motores de Reservas, CRM).
+              </li>
+            </ul>
+            <h4 class="font-semibold text-lg mt-4 mb-2 text-slate-800">
+              Desventajas Clave:
+            </h4>
+            <ul class="list-disc list-inside text-sm space-y-1">
+              <li>
+                **Dependencia de Internet:** Requiere una conexión a internet
+                estable y confiable para operar. Una caída de la red puede
+                interrumpir las operaciones.
+              </li>
+              <li>
+                **Menor Personalización:** Las opciones de personalización
+                pueden ser más limitadas en comparación con un sistema
+                on-premise, ya que el software es una solución estándar para
+                múltiples clientes.
+              </li>
+              <li>
+                **Control de Datos Compartido:** El hotel tiene menos control
+                directo sobre dónde y cómo se almacenan los datos, dependiendo
+                de la confianza en el proveedor.
+              </li>
+              <li>
+                **Costos a Largo Plazo (Suscripción):** Aunque el costo inicial
+                es bajo, la suscripción recurrente puede ser más costosa a muy
+                largo plazo que una inversión única en on-premise, especialmente
+                si el hotel no crece.
+              </li>
+              <li>
+                **Seguridad del Proveedor:** La seguridad de los datos depende
+                en gran medida de las medidas de seguridad y la reputación del
+                proveedor de la nube.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="benefits" class="py-16">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900">
+            Beneficios Clave: La Ventaja Competitiva Avanzada 🚀
+          </h2>
+          <p class="max-w-2xl mx-auto mt-4 text-slate-600">
+            Implementar un SIGH moderno no es solo modernizar, es una inversión
+            estratégica que genera retornos claros y una posición ventajosa en
+            el mercado, impactando directamente en la eficiencia, la
+            satisfacción del cliente y la rentabilidad.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div
+            class="bg-white p-6 rounded-lg shadow-md border border-slate-200"
+          >
+            <div class="text-3xl mb-3">⚙️</div>
+            <h3 class="font-bold text-lg mb-2">
+              Optimización de Procesos y Eficiencia Operativa Superior
+            </h3>
+            <p class="text-sm">
+              Automatiza tareas repetitivas y que consumen mucho tiempo, como el
+              check-in, la facturación, la gestión de inventario de habitaciones
+              y la actualización de disponibilidad en múltiples canales. Esto
+              puede llevar a una **reducción de la carga de trabajo manual en
+              hasta un 70%** y una minimización drástica de errores, liberando
+              al personal para enfocarse en la atención al cliente de mayor
+              calidad.
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-lg shadow-md border border-slate-200"
+          >
+            <div class="text-3xl mb-3">⭐</div>
+            <h3 class="font-bold text-lg mb-2">
+              Mejora Sustancial en la Calidad del Servicio y Personalización
+            </h3>
+            <p class="text-sm">
+              Permite un servicio más rápido, consistente y altamente
+              **personalizado** gracias al acceso instantáneo al historial
+              completo de estadías del huésped, sus preferencias (ej. tipo de
+              almohada, vista preferida), quejas previas y consumos.
+              **Ejemplo:** El sistema notifica al personal de recepción sobre la
+              preferencia de un huésped por una habitación tranquila antes de su
+              llegada, permitiendo una asignación proactiva y un "wow factor" en
+              el servicio.
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-lg shadow-md border border-slate-200"
+          >
+            <div class="text-3xl mb-3">🧠</div>
+            <h3 class="font-bold text-lg mb-2">
+              Toma de Decisiones Estratégicas Basada en Datos Precisos
+            </h3>
+            <p class="text-sm">
+              Genera reportes y estadísticas detalladas en tiempo real
+              (ocupación, ingresos, RevPar, origen de reservas, segmentos de
+              clientes, duración promedio de estadía). Esto permite a la
+              gerencia **identificar tendencias de mercado, optimizar
+              estrategias de precios, evaluar la efectividad de promociones y
+              planificar recursos** con una precisión sin precedentes,
+              transformando la gestión en una ciencia de datos.
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-lg shadow-md border border-slate-200"
+          >
+            <div class="text-3xl mb-3">💰</div>
+            <h3 class="font-bold text-lg mb-2">
+              Incremento de Rentabilidad y Maximización de Ingresos (Revenue
+              Management)
+            </h3>
+            <p class="text-sm">
+              A través de la gestión dinámica de tarifas (a menudo integrada con
+              RMS) y la sincronización eficiente de canales, el SIGH asegura que
+              el hotel venda la habitación correcta, al precio correcto, al
+              cliente correcto, en el momento correcto. Esto se traduce
+              directamente en un **aumento significativo del RevPAR** y una
+              optimización de la ocupación, incluso en temporadas de baja
+              demanda.
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-lg shadow-md border border-slate-200"
+          >
+            <div class="text-3xl mb-3">⚡</div>
+            <h3 class="font-bold text-lg mb-2">
+              Mayor Productividad y Satisfacción del Personal
+            </h3>
+            <p class="text-sm">
+              Al automatizar tareas rutinarias y repetitivas, el personal del
+              hotel puede dedicar más tiempo a interactuar con los huéspedes,
+              resolver problemas complejos y mejorar su experiencia general.
+              Esto no solo aumenta la eficiencia del equipo, sino que también
+              contribuye a una **mayor satisfacción laboral** al reducir la
+              carga administrativa y permitir un trabajo más enfocado en el
+              servicio. **Comparación:** Menos tiempo en papeleo y más tiempo
+              construyendo relaciones con los huéspedes.
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-lg shadow-md border border-slate-200"
+          >
+            <div class="text-3xl mb-3">🏆</div>
+            <h3 class="font-bold text-lg mb-2">
+              Ventaja Competitiva Sostenible y Adaptabilidad al Mercado
+            </h3>
+            <p class="text-sm">
+              Un SIGH moderno permite al hotel diferenciarse en un mercado
+              competitivo ofreciendo un servicio más ágil, personalizado y
+              profesional. Facilita la **rápida adaptación a las fluctuaciones
+              del mercado** (ej. cambios en la demanda, aparición de nuevos
+              competidores) y a las nuevas demandas de los clientes (ej.
+              check-in móvil, llaves digitales), manteniendo al hotel a la
+              vanguardia de la innovación.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="strategy"
+        class="py-16 text-center bg-sky-700 text-white rounded-2xl"
+      >
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+          El SIGH como Herramienta Estratégica e Innovadora: Mirando al Futuro
+          💡
+        </h2>
+        <p class="max-w-3xl mx-auto text-lg text-sky-100">
+          En el panorama actual de la hotelería, la tecnología no es solo un
+          soporte operativo, sino un **motor fundamental de crecimiento,
+          innovación y diferenciación**. Un SIGH moderno trasciende la simple
+          gestión de habitaciones; se convierte en un gestor integral de la
+          información, el tiempo y, crucialmente, la experiencia del cliente,
+          consolidando así los tres pilares esenciales para el éxito en la
+          hotelería del siglo XXI. Es una **inversión estratégica clave** que
+          genera activos intangibles (como el conocimiento profundo del cliente
+          y la reputación online) y capital intelectual, impulsando la mejora
+          continua y la capacidad de respuesta ante un mercado global en
+          constante evolución.
+        </p>
+        <h3 class="text-2xl font-bold mt-8 mb-4">
+          Integración y Tendencias Futuras en la Gestión Hotelera 🔗
+        </h3>
+        <p class="max-w-3xl mx-auto text-base text-sky-100">
+          La verdadera potencia de un SIGH reside en su capacidad de
+          **integración fluida** con todos los demás sistemas del ecosistema
+          hotelero. Esta interconexión crea un flujo de datos unificado y en
+          tiempo real que alimenta la inteligencia de negocio y permite una
+          operación verdaderamente sinérgica. Las tendencias futuras que están
+          redefiniendo el papel del SIGH y la gestión hotelera incluyen:
+        </p>
+        <ul
+          class="list-disc list-inside max-w-xl mx-auto text-base text-sky-100 mt-4 space-y-2"
+        >
+          <li>
+            **Inteligencia Artificial (IA) y Machine Learning (ML):**
+            <ul>
+              <li>
+                **Pronósticos de Demanda Hiper-precisos:** Los algoritmos de ML
+                analizan patrones históricos, eventos, clima y redes sociales
+                para predecir la demanda con una exactitud sin precedentes,
+                optimizando tarifas y recursos.
+              </li>
+              <li>
+                **Personalización de Ofertas:** La IA permite crear ofertas y
+                experiencias ultra-personalizadas para cada huésped, basándose
+                en su historial y preferencias.
+              </li>
+              <li>
+                **Automatización de Respuestas (Chatbots):** Asistentes
+                virtuales impulsados por IA para responder preguntas frecuentes
+                y gestionar solicitudes básicas de huéspedes.
+              </li>
+            </ul>
+          </li>
+          <li>
+            **Internet de las Cosas (IoT) y Automatización de Habitaciones:**
+            <ul>
+              <li>
+                **Conexión de Dispositivos Inteligentes:** Integración de
+                termostatos, iluminación, cortinas, televisores y sistemas de
+                entrada con el SIGH.
+              </li>
+              <li>
+                **Experiencia del Huésped Mejorada:** Los huéspedes pueden
+                controlar el ambiente de su habitación desde su smartphone o una
+                tablet provista, o el hotel puede ajustar la temperatura
+                automáticamente al check-in.
+              </li>
+              <li>
+                **Eficiencia Energética:** El SIGH puede apagar luces o el aire
+                acondicionado automáticamente cuando la habitación está
+                desocupada.
+              </li>
+            </ul>
+          </li>
+          <li>
+            **Check-in/Check-out Móvil y Sin Contacto (Contactless):**
+            <ul>
+              <li>
+                **Experiencia Fluida:** Mayor adopción de soluciones que
+                permiten a los huéspedes gestionar su estadía desde sus propios
+                dispositivos móviles, desde el pre-check-in hasta la llave
+                digital.
+              </li>
+              <li>
+                **Eficiencia Operativa:** Reduce la congestión en la recepción y
+                permite al personal enfocarse en interacciones de mayor valor.
+              </li>
+              <li>
+                **Seguridad e Higiene:** Especialmente relevante en contextos
+                post-pandemia, minimizando el contacto físico.
+              </li>
+            </ul>
+          </li>
+          <li>
+            **Análisis Predictivo y Big Data:**
+            <ul>
+              <li>
+                **Optimización de Recursos:** Utilizar grandes volúmenes de
+                datos para prever no solo la demanda de habitaciones, sino
+                también la necesidad de personal, inventario de alimentos y
+                bebidas, y mantenimiento.
+              </li>
+              <li>
+                **Identificación de Tendencias Emergentes:** Anticipar cambios
+                en los comportamientos de los clientes y las tendencias del
+                mercado global para ajustar estrategias proactivamente.
+              </li>
+            </ul>
+          </li>
+          <li>
+            **Integración Abierta (APIs):**
+            <ul>
+              <li>
+                Los SIGH modernos ofrecen APIs (Interfaces de Programación de
+                Aplicaciones) robustas que permiten una integración más fácil y
+                flexible con nuevas tecnologías y aplicaciones de terceros,
+                asegurando que el hotel pueda seguir innovando sin estar "atado"
+                a un solo proveedor.
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="bg-slate-800 text-white mt-16">
+      <div
+        class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm"
+      >
+        <p>
+          Material didáctico para la cátedra de Sistemas de Gestión Hotelera.
+        </p>
+        <p>Instituto Superior Santa Rosa de Calamuchita.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Smooth scrolling for nav links
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute("href")).scrollIntoView({
+              behavior: "smooth",
+            });
+          });
+        });
+
+        // Accordion functionality
+        const accordionButtons = document.querySelectorAll(".accordion-button");
+        accordionButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            const content = button.nextElementSibling;
+            const isActive = button.classList.contains("active");
+
+            accordionButtons.forEach((btn) => {
+              if (btn !== button && btn.classList.contains("active")) {
+                btn.classList.remove("active");
+                btn.nextElementSibling.style.maxHeight = "0";
+              }
+            });
+
+            if (isActive) {
+              button.classList.remove("active");
+              content.style.maxHeight = "0";
+            } else {
+              button.classList.add("active");
+              content.style.maxHeight = content.scrollHeight + "px";
+            }
+          });
+        });
+
+        // Timeline functionality
+        const timelineNav = document.getElementById("timeline-nav");
+        const timelineBtns = timelineNav.querySelectorAll(".timeline-btn");
+        const timelineContents = document
+          .getElementById("timeline-content-area")
+          .querySelectorAll(".timeline-content");
+
+        timelineNav.addEventListener("click", (e) => {
+          const targetBtn = e.target.closest(".timeline-btn");
+          if (!targetBtn) return;
+
+          const targetId = targetBtn.dataset.target;
+
+          timelineBtns.forEach((btn) => {
+            btn.classList.remove("border-sky-500");
+            btn.classList.add("border-sky-300");
+          });
+          targetBtn.classList.remove("border-sky-300");
+          targetBtn.classList.add("border-sky-500");
+
+          timelineContents.forEach((content) => {
+            content.classList.remove("active");
+            if (content.id === targetId) {
+              content.classList.add("active");
+            }
+          });
+        });
+
+        // Chart.js for Key Metrics
+        const ctx = document
+          .getElementById("performanceChart")
+          .getContext("2d");
+        const performanceChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: [
+              "Ene",
+              "Feb",
+              "Mar",
+              "Abr",
+              "May",
+              "Jun",
+              "Jul",
+              "Ago",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dic",
+            ],
+            datasets: [
+              {
+                label: "Ocupación (%)",
+                data: [65, 70, 75, 80, 78, 85, 90, 88, 72, 68, 60, 75],
+                borderColor: "#0284c7", // sky-600
+                backgroundColor: "rgba(2, 132, 199, 0.1)",
+                fill: false,
+                tension: 0.3,
+              },
+              {
+                label: "ADR ($)",
+                data: [
+                  120, 125, 130, 135, 132, 140, 150, 145, 128, 122, 115, 130,
+                ],
+                borderColor: "#f59e0b", // amber-500
+                backgroundColor: "rgba(245, 158, 11, 0.1)",
+                fill: false,
+                tension: 0.3,
+              },
+              {
+                label: "RevPAR ($)",
+                data: [
+                  78, 87.5, 97.5, 108, 103, 119, 135, 127.6, 92.16, 83, 69,
+                  97.5,
+                ],
+                borderColor: "#16a34a", // green-600
+                backgroundColor: "rgba(22, 163, 74, 0.1)",
+                fill: false,
+                tension: 0.3,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    let label = context.dataset.label || "";
+                    if (label) {
+                      label += ": ";
+                    }
+                    if (context.parsed.y !== null) {
+                      label += context.parsed.y.toFixed(2);
+                      if (context.dataset.label === "Ocupación (%)") {
+                        label += "%";
+                      } else {
+                        label += "$";
+                      }
+                    }
+                    return label;
+                  },
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Valor",
+                },
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: "Mes",
+                },
+              },
+            },
+          },
+        });
+      });
+    </script>
+  </body>
+</html>
